@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Room;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade as Pdf;
+use Illuminate\Support\Facades\Log;
+
+
 class BookingController extends Controller
 {
     /**
@@ -13,72 +18,119 @@ class BookingController extends Controller
      */
     public function index()
     {
-        //
+        $rooms = Room::where('available', 1)->paginate(6);  // Paginate the rooms
+        return view('bookings.index', compact('rooms')); 
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Room $room)
     {
-        //
-      $room = Room::findOrFail($room_id);
-    return view('bookings.create', compact('room'));
+
+        Log::info('Room ID = ' . $room->id . ', Price = ' . $room->price);
+    
+        return view('bookings.create', compact('room'));
+    
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'room_id' => 'required|exists:rooms,id',
-            'check_in' => 'required|date|after_or_equal:today',
+            'check_in' => 'required|date',
             'check_out' => 'required|date|after:check_in',
         ]);
-        $validated['user_id'] = Auth::id();
 
-        Booking::create($validated);
-        return redirect()->route('dashboard')->with('success', 'Room booked successfully!');
-        //
-    }
+        // Check room availability
+        if (!$this->checkAvailability($validated['room_id'], $validated['check_in'], $validated['check_out'])) {
+            return redirect()->back()->withErrors('The room is not available for the selected dates.');
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $user = auth()->user();
+        $room = Room::findOrFail($validated['room_id']);
+        $checkIn = Carbon::parse($validated['check_in']);
+        $checkOut = Carbon::parse($validated['check_out']);
+        $numberOfNights = $checkOut->diffInDays($checkIn);
+        $totalPrice = $room->price * $numberOfNights;
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        $booking = new Booking();
+        $booking->user_id = $user->id;
+        $booking->room_id = $validated['room_id'];
+        $booking->check_in = $validated['check_in'];
+        $booking->check_out = $validated['check_out'];
+        $booking->total_price = $totalPrice;
+        $booking->save();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        // Optionally mark the room as unavailable after booking
+        $room->available = false;
+        $room->save();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('booking.success')->with('success', 'Your booking has been confirmed!');
     }
 
     public function showAvailableRooms()
+    {
+        $rooms = Room::where('available', true)->paginate(6);  // Paginate available rooms
+        return view('bookings.available_rooms', compact('rooms'));
+    }
+
+    public function book($id)
+    {
+        $room = Room::find($id);
+
+        if ($room && $room->available) {
+            $room->available = false;
+            $room->save();
+            return redirect()->route('home')->with('success', 'Room booked successfully!');
+        }
+
+        return redirect()->route('home')->with('error', 'Room not available!');
+    }
+
+    private function checkAvailability($roomId, $checkIn, $checkOut)
+    {
+        $room = Room::findOrFail($roomId);
+        $existingBooking = Booking::where('room_id', $roomId)
+            ->where(function ($query) use ($checkIn, $checkOut) {
+                $query->whereBetween('check_in', [$checkIn, $checkOut])
+                    ->orWhereBetween('check_out', [$checkIn, $checkOut]);
+            })
+            ->exists();
+
+        return !$existingBooking;
+    }
+
+    public function myBookings()
+    {
+        $bookings = Booking::where('user_id', auth()->id())
+            ->with('room')
+            ->orderBy('check_in', 'desc')
+            ->paginate(6);
+    
+        return view('bookings.my', compact('bookings'));
+    }
+    
+    
+
+    public function invoice($id)
+    {
+        $booking = Booking::with('room', 'user')->where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        $totalAmount = $booking->total_price;
+
+        $pdf = Pdf::loadView('bookings.invoice', compact('booking', 'totalAmount'));
+        return $pdf->download('invoice_booking_' . $booking->id . '.pdf');
+    }
+
+    public function success()
+    {
+        return view('bookings.success');
+    }
+
+    public function show($id)
 {
-    $rooms = Room::where('available', true)->get();
-    return view('bookings.available_rooms', compact('rooms'));
+    $booking = Booking::findOrFail($id);
+    return view('bookings.show', compact('booking'));
 }
 
 }

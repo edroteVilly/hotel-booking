@@ -16,6 +16,7 @@
                 <th>Type</th>
                 <th>Price</th>
                 <th>Available</th>
+                <th>Image</th> <!-- Added Image column -->
                 <th>Actions</th>
             </tr>
         </thead>
@@ -26,6 +27,13 @@
                 <td>{{ $room->type }}</td>
                 <td>₱{{ $room->price }}</td>
                 <td>{{ $room->available ? 'Yes' : 'No' }}</td>
+                <td>
+                    @if($room->image)
+                        <img src="{{ asset('storage/' . $room->image) }}" alt="Room Image" style="width: 100px; height: 75px; object-fit: cover;">
+                    @else
+                        <span>No image</span>
+                    @endif
+                </td> <!-- Display room image -->
                 <td>
                     <a href="{{ route('rooms.edit', $room->id) }}" class="btn btn-sm btn-warning">Edit</a>
                     <form action="{{ route('rooms.destroy', $room->id) }}" method="POST" class="d-inline"

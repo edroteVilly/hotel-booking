@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('type');
             $table->decimal('price', 8, 2);
             $table->boolean('available')->default(true);
+            $table->string('image')->nullable(); // Add this line to store the image path
             $table->timestamps();
         });
     }

@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.pagination {
+    justify-content: center;
+    margin-top: 20px;
+}
+.page-link {
+    border-radius: 10px;
+    margin: 0 4px;
+    color: #343a40; /* Darker text */
+}
+.page-item.active .page-link {
+    background-color: #198754; /* Bootstrap success color */
+    border-color: #198754;
+}
+.page-link:hover {
+    background-color: #e9ecef;
+}
