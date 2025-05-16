@@ -2,15 +2,6 @@
 
 @section('content')
 <div class="container">
-<div>Generated URL: {{ route('bookings.create', $room->id) }}</div>
-
-{{-- Debugging Output --}}
-@if(isset($room))
-    <p>DEBUG: Room ID = {{ $room->id }}, Price = {{ $room->price }}</p>
-@else
-    <p>DEBUG: Room not set!</p>
-@endif
-
 <form action="{{ route('bookings.store') }}" method="POST">
         @csrf
         <input type="hidden" name="room_id" value="{{ $room->id }}">

@@ -12,15 +12,17 @@ class InvoiceController extends Controller
     // Download PDF
     public function downloadInvoice($id)
     {
-        $booking = Booking::with('room')->findOrFail($id);
+        $booking = Booking::findOrFail($id);
+
 
         $checkIn = Carbon::parse($booking->check_in);
         $checkOut = Carbon::parse($booking->check_out);
-        $nights = $checkOut->diffInDays($checkIn);
-        $total = $booking->room->price * max($nights, 1);
-
-        return PDF::loadView('invoices.booking', compact('booking', 'total'))
-                  ->download('invoice_booking_' . $booking->id . '.pdf');
+        $totalNights = max(1, $checkOut->diffInDays($checkIn));
+    
+        return Pdf::loadView('bookings.invoice', [
+            'booking' => $booking,
+            'totalNights' => $totalNights,
+        ])->download('booking_invoice_' . $booking->id . '.pdf');
     }
 
     // View invoice in browser
@@ -33,8 +35,8 @@ class InvoiceController extends Controller
     $checkIn = Carbon::parse($booking->check_in);  // Convert check-in date to Carbon instance
     $checkOut = Carbon::parse($booking->check_out);  // Convert check-out date to Carbon instance
 
-    $totalNights = $checkIn->diffInDays($checkOut);  // Get the difference in days
-    $totalCost = $totalNights * $booking->room->price;  // Multiply by the price per night
+    $totalNights = max(1, \Carbon\Carbon::parse($booking->check_in)->diffInDays($booking->check_out));
+    $totalCost = $booking->room->price * $totalNights;  // Multiply by the price per night
 
     // Pass the calculated values to the view
     return view('invoice.preview', [
@@ -56,7 +58,7 @@ class InvoiceController extends Controller
         $nights = $checkOut->diffInDays($checkIn);
         $total = $booking->room->price * max($nights, 1);
 
-        $pdf = PDF::loadView('invoices.booking', compact('booking', 'total'));
+        $pdf = PDF::loadView('bookings.invoice', compact('booking', 'total'));
         return $pdf->download('invoice_booking_' . $booking->id . '.pdf');
     }
 

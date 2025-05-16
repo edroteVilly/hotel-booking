@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
 
 class RoomController extends Controller
 {
@@ -108,6 +110,14 @@ class RoomController extends Controller
             'type' => 'required',
             'price' => 'required|numeric',
         ]);
+        
+        if ($room->image && Storage::exists($room->image)) {
+            Storage::delete($room->image);
+        }
+    
+        // Store the new image
+        $path = $request->file('image')->store('room_images', 'public');
+        $room->image = $path;
     
         $validated['available'] = $request->has('available');
     

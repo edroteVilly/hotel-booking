@@ -41,19 +41,20 @@ class BookingController extends Controller
             'check_in' => 'required|date',
             'check_out' => 'required|date|after:check_in',
         ]);
-
+    
         // Check room availability
         if (!$this->checkAvailability($validated['room_id'], $validated['check_in'], $validated['check_out'])) {
             return redirect()->back()->withErrors('The room is not available for the selected dates.');
         }
-
+    
         $user = auth()->user();
         $room = Room::findOrFail($validated['room_id']);
         $checkIn = Carbon::parse($validated['check_in']);
         $checkOut = Carbon::parse($validated['check_out']);
-        $numberOfNights = $checkOut->diffInDays($checkIn);
+        $numberOfNights = max(1, $checkIn->diffInDays($checkOut)); // ✅ fixed
+    
         $totalPrice = $room->price * $numberOfNights;
-
+    
         $booking = new Booking();
         $booking->user_id = $user->id;
         $booking->room_id = $validated['room_id'];
@@ -61,18 +62,19 @@ class BookingController extends Controller
         $booking->check_out = $validated['check_out'];
         $booking->total_price = $totalPrice;
         $booking->save();
-
+    
         // Optionally mark the room as unavailable after booking
         $room->available = false;
         $room->save();
-
-        return redirect()->route('booking.success')->with('success', 'Your booking has been confirmed!');
+    
+        return redirect()->route('bookings.success')->with('success', 'Your booking has been confirmed!');
     }
+    
 
     public function showAvailableRooms()
     {
         $rooms = Room::where('available', true)->paginate(6);  // Paginate available rooms
-        return view('bookings.available_rooms', compact('rooms'));
+        return view('bookings.index', compact('rooms'));
     }
 
     public function book($id)
@@ -132,5 +134,15 @@ class BookingController extends Controller
     $booking = Booking::findOrFail($id);
     return view('bookings.show', compact('booking'));
 }
+
+public function adminIndex()
+{
+    if (auth()->user()->role !== 'admin') {
+        abort(403, 'Forbidden');
+    }
+    $bookings = \App\Models\Booking::with('user', 'room')->latest()->get();
+    return view('admin.bookings.index', compact('bookings'));
+}
+
 
 }

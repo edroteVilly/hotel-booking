@@ -8,6 +8,12 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\AuthenticatedSessionController;
 
+// Route to show booking success page
+Route::get('/bookings/success', function () {
+    return view('bookings.success');
+})->name('bookings.success');
+
+
 // **Invoice Routes**
 Route::get('/bookings/{booking}/invoice-preview', [InvoiceController::class, 'showInvoicePage'])->name('invoice.preview');
 Route::get('/invoice/{id}/preview', [InvoiceController::class, 'viewInvoice'])->name('invoice.view');
@@ -39,7 +45,11 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 // Authenticated routes
 Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/dashboard', [\App\Http\Controllers\AdminController::class, 'dashboard'])
+    ->name('admin.dashboard');
+
     Route::get('/my-bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/admin/bookings', [\App\Http\Controllers\BookingController::class, 'adminIndex'])->name('admin.bookings');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('bookings.my');
     Route::get('/profile', function () {

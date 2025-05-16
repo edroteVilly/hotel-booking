@@ -3,37 +3,29 @@
 @section('content')
 <div class="container">
     <h2>Admin Dashboard</h2>
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Rooms</h5>
-                    <p class="card-text">{{ $totalRooms }}</p>
-                </div>
+    <div class="row text-white">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary p-3">
+                <h5>Total Users</h5>
+                <h3>{{ $totalUsers }}</h3>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Bookings</h5>
-                    <p class="card-text">{{ $totalBookings }}</p>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success p-3">
+                <h5>Total Rooms</h5>
+                <h3>{{ $totalRooms }}</h3>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Customers</h5>
-                    <p class="card-text">{{ $totalCustomers }}</p>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning p-3">
+                <h5>Total Bookings</h5>
+                <h3>{{ $totalBookings }}</h3>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Revenue</h5>
-                    <p class="card-text">₱{{ number_format($totalRevenue, 2) }}</p>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger p-3">
+                <h5>Total Income</h5>
+                <h3>₱{{ number_format($totalIncome, 2) }}</h3>
             </div>
         </div>
     </div>

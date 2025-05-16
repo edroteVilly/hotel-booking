@@ -34,6 +34,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('rooms.index') }}">Admin Rooms</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.bookings') }}">Manage Bookings</a>
+                        </li>
                     @endif
 
                     <li class="nav-item dropdown">
