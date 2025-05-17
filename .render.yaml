@@ -8,7 +8,8 @@ services:
     dockerContext: .
     dockerfilePath: ./Dockerfile
     buildCommand: ""
-    startCommand: php artisan serve --host=0.0.0.0 --port=8000
+    startCommand:   php artisan migrate --force && \
+ artisan serve --host=0.0.0.0 --port=8000
     envVars:
       - key: APP_ENV
         value: production
