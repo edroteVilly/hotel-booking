@@ -20,7 +20,6 @@
     <span class="badge bg-success">Confirmed</span>
     <!-- View and Download Buttons -->
     <a href="{{ route('invoice.preview', $booking->id) }}" class="btn btn-outline-info btn-sm" target="_blank">View Invoice</a>
-    <a href="{{ route('invoice.download', $booking->id) }}" class="btn btn-outline-primary btn-sm">Download Invoice</a>
 </div>
 
                         </div>

@@ -61,7 +61,7 @@
 
                         <div class="card-body">
                             <h5 class="card-title text-center text-primary">Room {{ $room->room_number }}</h5>
-                            <p class="card-text text-center text-muted">{{ $room->type }}</p>
+                            <p class="card-text text-center">{{ $room->type }}</p>
                             <p class="card-text text-center text-success">Price: ₱{{ number_format($room->price, 2) }}</p>
 
                             @if($room->available)
