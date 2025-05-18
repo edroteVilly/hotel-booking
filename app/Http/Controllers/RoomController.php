@@ -111,20 +111,13 @@ class RoomController extends Controller
             'price' => 'required|numeric',
         ]);
         
-        if ($room->image && Storage::exists($room->image)) {
-            Storage::delete($room->image);
-        }
-    
-        // Store the new image
-        $path = $request->file('image')->store('room_images', 'public');
-        $room->image = $path;
-    
         $validated['available'] = $request->has('available');
     
         $room->update($validated);
     
         return redirect()->route('rooms.index')->with('success', 'Room updated successfully.');
     }
+    
 
     /**
      * Remove the specified resource from storage.

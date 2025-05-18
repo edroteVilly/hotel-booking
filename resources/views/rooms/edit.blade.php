@@ -27,20 +27,6 @@
             <label class="form-check-label">Available</label>
         </div>
 
-        <div class="mb-3">
-            <label>Current Room Image</label><br>
-            @if ($room->image)
-                <img src="{{ asset('storage/' . $room->image) }}" alt="Room Image" width="200" class="mb-2">
-            @else
-                <p>No image uploaded.</p>
-            @endif
-        </div>
-
-        <div class="mb-3">
-            <label>Upload New Image</label>
-            <input type="file" name="image" class="form-control">
-        </div>
-
         <button class="btn btn-primary">Update</button>
         <a href="{{ route('rooms.index') }}" class="btn btn-secondary">Cancel</a>
     </form>
