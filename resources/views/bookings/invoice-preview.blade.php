@@ -31,9 +31,6 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer text-end">
-            <a href="{{ route('invoice.download', $booking->id) }}" class="btn btn-primary btn-sm">Download Invoice</a>
-        </div>
     </div>
 </div>
 @endsection
